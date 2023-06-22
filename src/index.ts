@@ -4,11 +4,7 @@ import { PrismaClient } from "@prisma/client"; // here
 const app = express();
 const prisma = new PrismaClient(); // here
 
-app.get("/", async (req: Request, res: Response, next: NextFunction) => {
-  res.send("Hello World!");
-});
-
-// here
+// modify here
 app.get("/user", async (req: Request, res: Response, next: NextFunction) => {
   const allUsers = await prisma.user.findMany();
   console.log(allUsers);
