@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import db from "../utils/db";
 import bcrypt from "bcrypt";
+import { generateTokens } from "../utils/generateToken";
 
 export const Register = async (
   req: Request,
@@ -58,7 +59,20 @@ export const Login = async (
       },
     });
     if (user && (await bcrypt.compare(password, user.password))) {
-      return res.status(200).send("login complete");
+      const tokens = generateTokens(user);
+
+      await db.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          refreshtoken: tokens.refreshToken,
+        },
+      });
+      return res.status(200).json({
+        accesstoken: tokens.accessToken,
+        refreshtoken: tokens.refreshToken,
+      });
     }
     return res.status(400).send("Invalid credentials");
   } catch (error) {
